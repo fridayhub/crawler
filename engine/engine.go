@@ -1,8 +1,8 @@
 package engine
 
 import (
+	"github.com/hakits/crawler/fetcher"
 	"log"
-	"go_ex/job_crawler/fetcher"
 )
 
 func Run(seed ...Request) {

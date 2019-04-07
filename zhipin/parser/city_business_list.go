@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"go_ex/job_crawler/engine"
+	"github.com/hakits/crawler/engine"
 	"regexp"
 )
 

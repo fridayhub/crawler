@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"go_ex/job_crawler/engine"
-	"go_ex/job_crawler/zhipin/parser"
+	"github.com/hakits/crawler/engine"
+	"github.com/hakits/crawler/zhipin/parser"
 	"regexp"
 )
 
