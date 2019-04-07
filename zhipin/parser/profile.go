@@ -6,7 +6,7 @@ import (
 	"regexp"
 )
 
-var JobNameRe = regexp.MustCompile(`<title>([^<]+)</title>`) //match[0][1]
+//var JobNameRe = regexp.MustCompile(`<title>([^<]+)</title>`) //match[0][1]
 //CompanyRe := `<a ka="job-detail-company".*[\s].*target="_blank">[\s ]+(.*)[\s ]+</a>` //match[1][1]
 var CompanyRe = regexp.MustCompile(`company:'(.*)',`)                     //
 var ScaleRe = regexp.MustCompile(`<p><i class="icon-scale"></i>(.*)</p>`) //match[0][1]
@@ -20,13 +20,12 @@ var RecruiterRe = regexp.MustCompile(` </div>
                     <p class="gray">(.*)<em class="vdot">·</em>.*</p>
                 </div>`)
 
-func ParseProfile(contents []byte) engine.ParseResult {
+func ParseProfile(contents []byte, JobName string) engine.ParseResult {
 	profile := model.Profile{}
 
-	profile.JobName = string(regxItem(JobNameRe, contents)[0][1])
+	profile.JobName = JobName //string(regxItem(JobNameRe, contents)[0][1])
 	profile.Company = string(regxItem(CompanyRe, contents)[0][1])
 	profile.Scale = string(regxItem(ScaleRe, contents)[0][1])
-	profile.JobName = string(regxItem(JobNameRe, contents)[0][1])
 	profile.Salary = string(regxItem(SalaryRe, contents)[0][1])
 	tmpLYE := regxItem(LoYeEdRe, contents)
 	profile.Location = string(tmpLYE[0][1])  //地点

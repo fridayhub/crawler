@@ -6,7 +6,7 @@ import (
 )
 
 func TestParseCityList(t *testing.T) {
-	contents, e := ioutil.ReadFile("citylist_test_data.html")
+	contents, e := ioutil.ReadFile("cylist_test_data.html")
 	if e != nil {
 		panic(e)
 	}
