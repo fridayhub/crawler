@@ -49,7 +49,7 @@ func ParseBusinessList(contents []byte) engine.ParseResult {
 			})
 			result.Items = append(result.Items, string(v[2]))
 		}
-		break  //For testing, just get one business
+		//break  //For testing, just get one business
 	}
 	return result
 }

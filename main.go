@@ -3,13 +3,19 @@ package main
 import (
 	"fmt"
 	"github.com/hakits/crawler/engine"
+	"github.com/hakits/crawler/scheduler"
 	"github.com/hakits/crawler/zhipin/parser"
 	"regexp"
 )
 
 func main() {
 
-	engine.Run(engine.Request{
+	e := engine.ConcurrentEngine{
+		Scheduler:&scheduler.QueuedScheduler{},
+		WorkerCount:2,
+	}
+
+	e.Run(engine.Request{
 		Url:        parser.BaseUrl + "/c101010100/",
 		ParserFunc: parser.ParseCityList,
 	})
