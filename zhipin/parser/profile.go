@@ -11,7 +11,6 @@ import (
 var CompanyRe = regexp.MustCompile(`company:'(.*)',`)                     //
 var ScaleRe = regexp.MustCompile(`<p><i class="icon-scale"></i>(.*)</p>`) //match[0][1]
 var SalaryRe = regexp.MustCompile(`job_salary: '([0-9K-]+)'`)             //match[0][1]
-
 var LoYeEdRe = regexp.MustCompile(` <p>(.*)<em class="dolt"></em>(.*)<em class="dolt"></em>(.*)</p>`)
 var JobTagsRe = regexp.MustCompile(`<div class="job-tags">[\s ]+(.*)[\s ]+</div>`) //match[0][1]
 var JobSecRe = regexp.MustCompile(`<div class="text">[\s ]+(.*)[\s ]+</div>`)
@@ -20,7 +19,7 @@ var RecruiterRe = regexp.MustCompile(` </div>
                     <p class="gray">(.*)<em class="vdot">·</em>.*</p>
                 </div>`)
 
-func ParseProfile(contents []byte, JobName string) engine.ParseResult {
+func ParseProfile(contents []byte, JobName, Url string) engine.ParseResult {
 	profile := model.Profile{}
 
 	profile.JobName = JobName //string(regxItem(JobNameRe, contents)[0][1])
@@ -35,6 +34,7 @@ func ParseProfile(contents []byte, JobName string) engine.ParseResult {
 	profile.JobSec = string(regxItem(JobSecRe, contents)[0][1])
 	tmpRec := regxItem(RecruiterRe, contents)
 	profile.Recruiter = string(tmpRec[0][1]) + "|" + string(tmpRec[0][2])
+	profile.Url = Url
 
 	result := engine.ParseResult{
 		Items: []interface{}{profile},

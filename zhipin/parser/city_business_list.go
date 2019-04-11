@@ -49,12 +49,12 @@ func ParseBusinessList(contents []byte) engine.ParseResult {
 			})
 			result.Items = append(result.Items, string(v[2]))
 		}
-		//break  //For testing, just get one business
+		break //For testing, just get one business
 	}
 	return result
 }
 
-func ParseJobList(contents []byte) engine.ParseResult{
+func ParseJobList(contents []byte) engine.ParseResult {
 	result := engine.ParseResult{}
 
 	match := JobListRe.FindAllSubmatch(contents, -1)
@@ -62,10 +62,12 @@ func ParseJobList(contents []byte) engine.ParseResult{
 	for _, v := range match {
 		//fmt.Printf("%s\n", v[1])
 		jobName := string(v[2])
+		uri := string(v[1])
+		url := BaseUrl + uri
 		result.Requests = append(result.Requests, engine.Request{
-			Url:BaseUrl + string(v[1]),
-			ParserFunc: func(content []byte) engine.ParseResult {  //只是把函数赋值给ParseFunc 现在并不运行,engine调度的时候才运行
-				return ParseProfile(content, jobName)
+			Url: url,
+			ParserFunc: func(content []byte) engine.ParseResult { //只是把函数赋值给ParseFunc 现在并不运行,engine调度的时候才运行
+				return ParseProfile(content, jobName, url)
 			},
 		})
 		result.Items = append(result.Items, jobName)

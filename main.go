@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/hakits/crawler/engine"
+	"github.com/hakits/crawler/persist"
 	"github.com/hakits/crawler/scheduler"
 	"github.com/hakits/crawler/zhipin/parser"
 	"regexp"
@@ -13,6 +14,7 @@ func main() {
 	e := engine.ConcurrentEngine{
 		Scheduler:&scheduler.QueuedScheduler{},
 		WorkerCount:2,
+		ItemChan:persist.ItemSaver(),
 	}
 
 	e.Run(engine.Request{
