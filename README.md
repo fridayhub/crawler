@@ -1,10 +1,10 @@
 基于Golang的分布式爬虫
 目前有三个分支：
-master:
+##master:
 一个完备的单机爬虫, have been  concurrent branch to master.
 
-concurrent:
+###concurrent:
 并发版
 
-distribute:
+###distribute:
 基于jsonrpc的并发版，开发中
