@@ -24,7 +24,7 @@ func ParseCityList(contents []byte) engine.ParseResult {
 		if string(v[2]) == "全国" {
 			continue
 		}
-		result.Items = append(result.Items, string(v[2]))
+		//result.Items = append(result.Items, string(v[2]))
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        BaseUrl + string(v[1]),
 			ParserFunc: ParseBusinessList,
@@ -47,7 +47,7 @@ func ParseBusinessList(contents []byte) engine.ParseResult {
 				Url:        BaseUrl + string(v[1]) + "?page=" + strconv.Itoa(i) + "&query=" + query,
 				ParserFunc: ParseJobList,
 			})
-			result.Items = append(result.Items, string(v[2]))
+			//result.Items = append(result.Items, string(v[2]))
 		}
 		break //For testing, just get one business
 	}
@@ -70,7 +70,7 @@ func ParseJobList(contents []byte) engine.ParseResult {
 				return ParseProfile(content, jobName, url)
 			},
 		})
-		result.Items = append(result.Items, jobName)
+		//result.Items = append(result.Items, jobName)
 	}
 	return result
 }

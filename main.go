@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/hakits/crawler/engine"
-	"github.com/hakits/crawler/persist"
+	"github.com/hakits/crawler/persist/client"
 	"github.com/hakits/crawler/scheduler"
 	"github.com/hakits/crawler/zhipin/parser"
 	"regexp"
@@ -11,10 +11,15 @@ import (
 
 func main() {
 
+	itemChan, err := client.ItemSaver(":12345")
+	if err != nil {
+		panic(err)
+	}
+
 	e := engine.ConcurrentEngine{
-		Scheduler:&scheduler.QueuedScheduler{},
-		WorkerCount:2,
-		ItemChan:persist.ItemSaver(),
+		Scheduler:   &scheduler.QueuedScheduler{},
+		WorkerCount: 2,
+		ItemChan:    itemChan,
 	}
 
 	e.Run(engine.Request{
@@ -22,12 +27,11 @@ func main() {
 		ParserFunc: parser.ParseCityList,
 	})
 
-
-		//body, err := fetcher.Fetcher("https://www.zhipin.com/c101010100/b_%E6%9C%9D%E9%98%B3%E5%8C%BA/")
-		//if err != nil {
-		//	log.Printf("Fether:error fetch url %v", err)
-		//}
-		//printAreaList(body)
+	//body, err := fetcher.Fetcher("https://www.zhipin.com/c101010100/b_%E6%9C%9D%E9%98%B3%E5%8C%BA/")
+	//if err != nil {
+	//	log.Printf("Fether:error fetch url %v", err)
+	//}
+	//printAreaList(body)
 
 }
 
@@ -47,11 +51,11 @@ func printAreaList(contents []byte) {
 	//JobTags := `<div class="job-tags">[\s ]+(.*)[\s ]+</div>` //match[0][1]
 	//JobSec := `<div class="text">[\s ]+(.*)[\s ]+</div>`
 	//Recruiter := ` </div>
-    //                <h2 class="name">(.*)<i class="icon-vip"></i></h2>
-    //                <p class="gray">(.*)<em class="vdot">·</em>.*</p>
-    //            </div>`
+	//                <h2 class="name">(.*)<i class="icon-vip"></i></h2>
+	//                <p class="gray">(.*)<em class="vdot">·</em>.*</p>
+	//            </div>`
 
-    JobListRe := `<div class="job-primary">
+	JobListRe := `<div class="job-primary">
                                     <div class="info-primary">
                                         <h3 class="name">
                                             <a href="([^"]+)".*[\s ]+<div class="job-title">([^<]+)</div>`

@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"github.com/hakits/crawler/engine"
 	"github.com/hakits/crawler/model"
 	"regexp"
@@ -20,8 +22,8 @@ var RecruiterRe = regexp.MustCompile(` </div>
                 </div>`)
 
 func ParseProfile(contents []byte, JobName, Url string) engine.ParseResult {
-	profile := model.Profile{}
 
+	profile := model.Profile{}
 	profile.JobName = JobName //string(regxItem(JobNameRe, contents)[0][1])
 	profile.Company = string(regxItem(CompanyRe, contents)[0][1])
 	profile.Scale = string(regxItem(ScaleRe, contents)[0][1])
@@ -34,10 +36,19 @@ func ParseProfile(contents []byte, JobName, Url string) engine.ParseResult {
 	profile.JobSec = string(regxItem(JobSecRe, contents)[0][1])
 	tmpRec := regxItem(RecruiterRe, contents)
 	profile.Recruiter = string(tmpRec[0][1]) + "|" + string(tmpRec[0][2])
-	profile.Url = Url
+
+	h := md5.New()
+	h.Write([]byte(Url + profile.JobName + profile.Company  + profile.Recruiter))
+	cipherStr := h.Sum(nil)
+	id := hex.EncodeToString(cipherStr)
+	item := engine.Item{
+		Url:     Url,
+		Id:      id,
+		Payload: profile,
+	}
 
 	result := engine.ParseResult{
-		Items: []interface{}{profile},
+		Items:    []engine.Item{item},
 	}
 
 	return result
