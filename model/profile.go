@@ -11,5 +11,4 @@ type Profile struct {
 	JobTags string //福利
 	JobSec string //工作描述
 	Recruiter string //招聘者
-	Url string
 }

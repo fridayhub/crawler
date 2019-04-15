@@ -1,11 +1,13 @@
 package engine
 
-import "log"
+import (
+	"log"
+)
 
 type ConcurrentEngine struct {
 	Scheduler   Scheduler
 	WorkerCount int
-	ItemChan chan interface{}
+	ItemChan    chan Item
 }
 
 type Scheduler interface {
@@ -33,7 +35,7 @@ func (c *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	for {
-		result := <- out
+		result := <-out
 		for _, item := range result.Items {
 			log.Printf("Got item:%v", item)
 			go func() {
@@ -41,18 +43,18 @@ func (c *ConcurrentEngine) Run(seeds ...Request) {
 			}()
 		}
 
-		for _, request := range result.Requests {  //submit new request to workerChan
+		for _, request := range result.Requests { //submit new request to workerChan
 			c.Scheduler.Submit(request)
 		}
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier)  {
+func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
 			// tell scheduler i'm ready
 			ready.WorkerReady(in)
-			request := <- in
+			request := <-in
 			result, err := worker(request)
 			if err != nil {
 				continue
@@ -60,5 +62,5 @@ func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier)  {
 			out <- result
 		}
 	}()
-	
+
 }
