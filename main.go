@@ -2,29 +2,37 @@ package main
 
 import (
 	"fmt"
+	"github.com/hakits/crawler/config"
 	"github.com/hakits/crawler/engine"
-	"github.com/hakits/crawler/persist/client"
+	persistClient "github.com/hakits/crawler/persist/client"
 	"github.com/hakits/crawler/scheduler"
+	processClient "github.com/hakits/crawler/worker/client"
 	"github.com/hakits/crawler/zhipin/parser"
 	"regexp"
 )
 
 func main() {
 
-	itemChan, err := client.ItemSaver(":12345")
+	itemChan, err := persistClient.ItemSaver(config.ItemSaverAddr)
+	if err != nil {
+		panic(err)
+	}
+
+	processor, err := processClient.CreateProcessor()
 	if err != nil {
 		panic(err)
 	}
 
 	e := engine.ConcurrentEngine{
-		Scheduler:   &scheduler.QueuedScheduler{},
-		WorkerCount: 2,
-		ItemChan:    itemChan,
+		Scheduler:        &scheduler.QueuedScheduler{},
+		WorkerCount:      2,
+		ItemChan:         itemChan,
+		RequestProcessor: processor,
 	}
 
 	e.Run(engine.Request{
-		Url:        parser.BaseUrl + "/c101010100/",
-		ParserFunc: parser.ParseCityList,
+		Url:    parser.BaseUrl + "/c101010100/",
+		Parser: engine.NewFuncParser(parser.ParseCityList, "ParseCityList"),
 	})
 
 	//body, err := fetcher.Fetcher("https://www.zhipin.com/c101010100/b_%E6%9C%9D%E9%98%B3%E5%8C%BA/")

@@ -21,7 +21,7 @@ var RecruiterRe = regexp.MustCompile(` </div>
                     <p class="gray">(.*)<em class="vdot">·</em>.*</p>
                 </div>`)
 
-func ParseProfile(contents []byte, JobName, Url string) engine.ParseResult {
+func parseProfile(contents []byte, JobName, Url string) engine.ParseResult {
 
 	profile := model.Profile{}
 	profile.JobName = JobName //string(regxItem(JobNameRe, contents)[0][1])

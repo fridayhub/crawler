@@ -5,10 +5,13 @@ import (
 )
 
 type ConcurrentEngine struct {
-	Scheduler   Scheduler
-	WorkerCount int
-	ItemChan    chan Item
+	Scheduler        Scheduler
+	WorkerCount      int
+	ItemChan         chan Item
+	RequestProcessor Processor
 }
+
+type Processor func(Request) (ParseResult, error)
 
 type Scheduler interface {
 	Submit(Request)
@@ -31,7 +34,7 @@ func (c *ConcurrentEngine) Run(seeds ...Request) {
 	}
 
 	for i := 0; i < c.WorkerCount; i++ { //According WorkerCount, concurrent all work
-		createWorker(c.Scheduler.WorkerChan(), out, c.Scheduler)
+		c.createWorker(c.Scheduler.WorkerChan(), out, c.Scheduler)
 	}
 
 	for {
@@ -49,13 +52,13 @@ func (c *ConcurrentEngine) Run(seeds ...Request) {
 	}
 }
 
-func createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
+func (c *ConcurrentEngine) createWorker(in chan Request, out chan ParseResult, ready ReadyNotifier) {
 	go func() {
 		for {
 			// tell scheduler i'm ready
 			ready.WorkerReady(in)
 			request := <-in
-			result, err := worker(request)
+			result, err := c.RequestProcessor(request) //Worker(request) //call rpc
 			if err != nil {
 				continue
 			}

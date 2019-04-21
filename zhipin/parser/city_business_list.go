@@ -1,6 +1,7 @@
 package parser
 
 import (
+	"github.com/hakits/crawler/config"
 	"github.com/hakits/crawler/engine"
 	"regexp"
 	"strconv"
@@ -27,7 +28,7 @@ func ParseCityList(contents []byte) engine.ParseResult {
 		//result.Items = append(result.Items, string(v[2]))
 		result.Requests = append(result.Requests, engine.Request{
 			Url:        BaseUrl + string(v[1]),
-			ParserFunc: ParseBusinessList,
+			Parser: engine.NewFuncParser(ParseBusinessList, config.ParseBusinessList), //之前的parseFunc函数，改成Parser接口
 		})
 		break //For testing,just get one city
 	}
@@ -45,13 +46,37 @@ func ParseBusinessList(contents []byte) engine.ParseResult {
 		for i := 1; i <= 10; i++ {
 			result.Requests = append(result.Requests, engine.Request{
 				Url:        BaseUrl + string(v[1]) + "?page=" + strconv.Itoa(i) + "&query=" + query,
-				ParserFunc: ParseJobList,
+				Parser: engine.NewFuncParser(ParseJobList, config.ParseJobList),
 			})
 			//result.Items = append(result.Items, string(v[2]))
 		}
 		break //For testing, just get one business
 	}
 	return result
+}
+
+type ProfileParser struct {
+	jobName string
+	url string
+}
+
+func (p *ProfileParser) Parse(content []byte) engine.ParseResult {
+	return parseProfile(content, p.jobName, p.url)
+}
+
+func (p *ProfileParser) Serialize() (name string, args interface{}) {
+	var tmpargs []string
+	tmpargs = append(tmpargs, p.jobName)
+	tmpargs = append(tmpargs, p.url)
+	//fmt.Printf("args:%v", tmpargs)
+	return config.ProfileParser, tmpargs
+}
+
+func NewProfileParser(args []string) *ProfileParser  {
+	return &ProfileParser{
+		jobName:args[0],
+		url: args[1],
+	}
 }
 
 func ParseJobList(contents []byte) engine.ParseResult {
@@ -64,11 +89,13 @@ func ParseJobList(contents []byte) engine.ParseResult {
 		jobName := string(v[2])
 		uri := string(v[1])
 		url := BaseUrl + uri
+		var args []string
+		args = append(args,jobName)
+		args = append(args, url)
+
 		result.Requests = append(result.Requests, engine.Request{
 			Url: url,
-			ParserFunc: func(content []byte) engine.ParseResult { //只是把函数赋值给ParseFunc 现在并不运行,engine调度的时候才运行
-				return ParseProfile(content, jobName, url)
-			},
+			Parser: NewProfileParser(args),
 		})
 		//result.Items = append(result.Items, jobName)
 	}

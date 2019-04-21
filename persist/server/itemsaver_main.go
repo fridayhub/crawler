@@ -2,12 +2,13 @@ package main
 
 import (
 	"github.com/go-redis/redis"
+	"github.com/hakits/crawler/config"
 	"github.com/hakits/crawler/persist"
 	"github.com/hakits/crawler/rpccall"
 )
 
 func main() {
-	err := serveRpc("localhost:12345")
+	err := serveRpc(config.ItemSaverAddr)
 	if err != nil {
 		panic(err)
 	}
