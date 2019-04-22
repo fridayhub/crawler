@@ -7,4 +7,13 @@
 并发版
 
 ###distribute:
-基于jsonrpc的并发版，开发中
+基于jsonrpc的分布式版，分为三个模块
+
+* engine
+  负责整个爬虫的调度
+  
+* worker
+  多个goroutine，负责并发爬取网页
+ 
+* persist
+  负责讲解析后的数据持久化保存

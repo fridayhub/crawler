@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.com/go-redis/redis"
 	"log"
 )
 
@@ -9,6 +10,7 @@ type ConcurrentEngine struct {
 	WorkerCount      int
 	ItemChan         chan Item
 	RequestProcessor Processor
+	RedisCli         *redis.Client
 }
 
 type Processor func(Request) (ParseResult, error)
@@ -47,7 +49,13 @@ func (c *ConcurrentEngine) Run(seeds ...Request) {
 		}
 
 		for _, request := range result.Requests { //submit new request to workerChan
-			c.Scheduler.Submit(request)
+			go func(request Request) {
+				add := c.RedisCli.SAdd("check_zhipin_url", request.Url)
+				log.Println("..........", add.Val())
+				if add.Val() == 1 {
+					c.Scheduler.Submit(request)
+				}
+			}(request)
 		}
 	}
 }

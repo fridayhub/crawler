@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-redis/redis"
 	"github.com/hakits/crawler/config"
 	"github.com/hakits/crawler/engine"
 	persistClient "github.com/hakits/crawler/persist/client"
@@ -23,11 +24,18 @@ func main() {
 		panic(err)
 	}
 
+	redisCli := redis.NewClient(&redis.Options{
+		Addr:     "127.0.0.1:6379",
+		Password: "",
+		DB:       0,
+	})
+
 	e := engine.ConcurrentEngine{
 		Scheduler:        &scheduler.QueuedScheduler{},
 		WorkerCount:      2,
 		ItemChan:         itemChan,
 		RequestProcessor: processor,
+		RedisCli:         redisCli,
 	}
 
 	e.Run(engine.Request{
